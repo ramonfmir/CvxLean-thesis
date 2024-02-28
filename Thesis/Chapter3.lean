@@ -120,8 +120,7 @@ equivalence eqv₂/p₃ : p₂ := by
   conv_obj =>
     rw [← exp_add]
   conv_constr c₂ =>
-    rw [← log_le_log_iff (by norm_num) (exp_pos _), log_exp]
-    norm_num
+    simp
 
 open Equivalence
 
