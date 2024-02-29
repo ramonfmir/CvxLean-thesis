@@ -12,7 +12,7 @@ section ReachingOutToTheOptimizationCommunity
 
 def p :=
   optimization (x y : ℝ)
-    maximize (2 * x : ℝ)
+    minimize -2 * x
     subject to
       c₁ : 0 ≤ x
       c₂ : 1 < y
