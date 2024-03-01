@@ -39,7 +39,7 @@ def pex₁ := Minimization.mk (fun (x : ℝ) => x) (fun x => 1 ≤ x ∧ x ≤ e
 
 def pex₂ := Minimization.mk (fun (x : ℝ) => log x) (fun x => 1 ≤ x ∧ x ≤ exp 1)
 
-def pex₃ := Minimization.mk (fun (x : ℝ) => (log x) ^ (2 : ℝ)) (fun x => 1 ≤ x ∧ x ≤ exp 1)
+def pex₃ := Minimization.mk (fun (x : ℝ) => (log x) ^ 2) (fun x => 1 ≤ x ∧ x ≤ exp 1)
 
 def E₁₂ : pex₁ ≡ pex₂ := Equivalence.map_objFun_log (fun x h => by positivity!)
 
@@ -162,12 +162,8 @@ lemma trace_mul_transpose_self_eq_quad_of_symm {n} (A : Matrix (Fin n) (Fin n) �
     (hA : IsSymm A) :
     trace (A * (Vec.toMatrix x * (Vec.toMatrix x)ᵀ)) = vecMul x A ⬝ᵥ x := by
   simp [trace, dotProduct]
-  congr; funext i;
-  simp [Matrix.mul_apply, vecMul, dotProduct, Finset.sum_mul]
-  congr; funext j;
-  simp [Vec.toMatrix]
-  rw [hA.apply i j]
-  ring
+  congr; funext i; simp [Matrix.mul_apply, vecMul, dotProduct, Finset.sum_mul]
+  congr; funext j; simp [Vec.toMatrix]; rw [hA.apply i j]; ring
 
 def sdr {n} {A C : Matrix (Fin n) (Fin n) ℝ} (hA : IsSymm A) (hC : IsSymm C) (b : ℝ) :
   (optimization (x : Fin n → ℝ)
