@@ -3,3 +3,5 @@
 /.lake
 *.olean
 *.code-workspace
+
+/egg-pre-dcp
