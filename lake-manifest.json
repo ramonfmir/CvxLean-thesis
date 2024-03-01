@@ -67,7 +67,7 @@
   {"url": "https://github.com/verified-optimization/CvxLean",
    "type": "git",
    "subDir": null,
-   "rev": "4d3233e0b48e51774b084063c7716d13fab04bbd",
+   "rev": "678c050ec3929b14e1c45c16599320cd5e4b9830",
    "name": "CvxLean",
    "manifestFile": "lake-manifest.json",
    "inputRev": "main",
