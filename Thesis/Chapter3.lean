@@ -42,6 +42,20 @@ namespace Equivalences
 
 /-! Section 3.3 -/
 
+#check Equivalence
+
+#check Equivalence.refl
+#check Equivalence.symm
+#check Equivalence.trans
+
+#check StrongEquivalence
+
+#check StrongEquivalence.refl
+#check StrongEquivalence.symm
+#check StrongEquivalence.trans
+
+#check Equivalence.ofStrongEquivalence
+
 open Equivalence
 
 -- These are the proofs of equivalences and strong equivalnces between the three examples involving
@@ -276,6 +290,14 @@ namespace Reductions
 
 /-! Section 3.4 -/
 
+#check Reduction
+
+#check Reduction.refl
+#check Reduction.trans
+
+#check Reduction.ofEquivalence
+#check Equivalence.ofReductions
+
 def p :=
   optimization (x y : ℝ)
     minimize (x + y)
@@ -301,6 +323,14 @@ end Reductions
 namespace Relaxations
 
 /-! Section 3.5 -/
+
+#check Relaxation
+
+#check Relaxation.refl
+#check Relaxation.trans
+
+#check Relaxation.ofStrongEquivalence
+#check StrongEquivalence.ofRelaxations
 
 open Relaxation
 
