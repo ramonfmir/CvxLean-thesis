@@ -19,7 +19,7 @@ def p :=
       c₃ : log (y - 1) ≤ 2 * sqrt x + 1
       c₄ : 3 * x + 5 * y ≤ 10
 
-equivalence' eqv/q : p := by
+equivalence* eqv/q : p := by
   change_of_variables! (v) (y ↦ v + 1)
   change_of_variables! (w) (v ↦ exp w)
   remove_constr c₂ =>
