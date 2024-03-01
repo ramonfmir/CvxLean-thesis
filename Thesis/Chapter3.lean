@@ -8,7 +8,14 @@ namespace Chapter3
 
 namespace CvxLeanOverview
 
-/-! Section 3.1 -/
+/-! Section 3.2 -/
+
+#check Minimization
+
+#check feasible
+#check optimal
+
+#check Solution
 
 def p :=
   optimization (x y : ℝ)
@@ -33,13 +40,33 @@ end CvxLeanOverview
 
 namespace Equivalences
 
-/-! Section 3.2 -/
+/-! Section 3.3 -/
 
-def pex₁ := Minimization.mk (fun (x : ℝ) => x) (fun x => 1 ≤ x ∧ x ≤ exp 1)
+open Equivalence
 
-def pex₂ := Minimization.mk (fun (x : ℝ) => log x) (fun x => 1 ≤ x ∧ x ≤ exp 1)
+-- These are the proofs of equivalences and strong equivalnces between the three examples involving
+-- `x`, `log(x)` and `log(x)^2` in their objective functions.
 
-def pex₃ := Minimization.mk (fun (x : ℝ) => (log x) ^ 2) (fun x => 1 ≤ x ∧ x ≤ exp 1)
+def pex₁ :=
+  optimization (x : ℝ)
+    minimize x
+    subject to
+      h₁ : 1 ≤ x
+      h₂ : x ≤ exp 1
+
+def pex₂ :=
+  optimization (x : ℝ)
+    minimize log x
+    subject to
+      h₁ : 1 ≤ x
+      h₂ : x ≤ exp 1
+
+def pex₃ :=
+  optimization (x : ℝ)
+    minimize ((log x) ^ 2 : ℝ)
+    subject to
+      h₁ : 1 ≤ x
+      h₂ : x ≤ exp 1
 
 def E₁₂ : pex₁ ≡ pex₂ := Equivalence.map_objFun_log (fun x h => by positivity!)
 
@@ -85,29 +112,69 @@ def S₂₃ : pex₂ ≡' pex₃ :=
     psi_optimality := fun x _ => by
       simp [pex₂, pex₃, feasible, constraints, objFun] at * }
 
-def p₄ := Minimization.mk (fun (x : ℝ) => x) (fun x => 0 ≤ x ∧ x ≤ 1)
+def pex₄ := Minimization.mk (fun (x : ℝ) => x) (fun x => 0 ≤ x ∧ x ≤ 1)
 
-def S₄₂ : p₄ ≡' pex₂ :=
+def S₄₂ : pex₄ ≡' pex₂ :=
   { phi := fun x => exp x
     psi := fun x => log x
     phi_feasibility := fun x _ => by
-      simp [p₄, pex₂, feasible, constraints, objFun] at *
+      simp [pex₄, pex₂, feasible, constraints, objFun] at *
       split_ands <;> linarith,
     psi_feasibility := fun x h_feas_x => by
-      simp [p₄, pex₂, feasible, constraints, objFun] at *
+      simp [pex₄, pex₂, feasible, constraints, objFun] at *
       have hx : 0 < x := by linarith
       have h_0_eq_log1 : 0 = log 1 := by simp
       have h_1_eq_loge : 1 = log (exp 1) := by simp
       rw [h_1_eq_loge, h_0_eq_log1]
       rwa [log_le_log_iff hx (exp_pos _), log_le_log_iff (by norm_num) hx],
     phi_optimality := fun x _ => by
-      simp [p₄, pex₂, feasible, constraints, objFun] at *,
+      simp [pex₄, pex₂, feasible, constraints, objFun] at *,
     psi_optimality := fun x _ => by
-      simp [p₄, pex₂, feasible, constraints, objFun] at *, }
+      simp [pex₄, pex₂, feasible, constraints, objFun] at *, }
 
-def nS₄₁ : (p₄ ≡' pex₁) → False := fun h => nS₁₂ <| h.symm.trans S₄₂
+def nS₄₁ : (pex₄ ≡' pex₁) → False := fun h => nS₁₂ <| h.symm.trans S₄₂
 
-equivalence eqv₁/p₂ :
+-- We introduce the `equivalence` command here.
+
+equivalence eqvₚ/r : CvxLeanOverview.p := by
+  -- Direct application of transitivity (users will rarely apply this).
+  equivalence_trans
+  -- Check goals here.
+  -- Close all goals by reflexivity on the first goal.
+  equivalence_rfl
+  -- Check new goal here.
+
+equivalence eqvₚ'/p' : CvxLeanOverview.p := by
+  -- Check initial goal here
+  equivalence_step =>
+    -- Any tactic, for example, we swap all multiplications.
+    simp only [mul_comm]
+  -- Check new goal here
+
+#print p'
+
+#check eqvₚ'
+
+equivalence* eqvComp/conicForm :
+  optimization (x : ℝ)
+    minimize (exp x)
+    subject to
+      c₁ : 0 ≤ x := by
+  -- We have not introduced this yet (see `Chapter4`).
+  dcp
+
+#print conicForm
+
+#check eqvComp.psi
+#check eqvComp.backward_map
+
+#eval eqvComp.backward_map ⟨1, 0⟩
+
+-- The rest are examples of tactics.
+
+#check instChangeOfVariablesRealExp
+
+equivalence* eqv₁/p₂ :
     optimization (x y : ℝ)
       minimize (x * y)
       subject to
@@ -116,27 +183,140 @@ equivalence eqv₁/p₂ :
   change_of_variables! (u) (x ↦ exp u)
   change_of_variables! (v) (y ↦ exp v)
 
+#print p₂
+#check eqv₁
+
+-- Note that the backward map here is non-trivial, due to the change of variables.
+#eval eqv₁.backward_map ⟨1, 1⟩
+
 equivalence eqv₂/p₃ : p₂ := by
   conv_obj =>
     rw [← exp_add]
   conv_constr c₂ =>
     simp
 
-open Equivalence
+#print p₃
+#check eqv₂
 
-equivalence eqv/q :
+equivalence eqv₃/p₄ :
     optimization (x : ℝ)
       minimize sqrt (x ^ 2)
       subject to
         c₁ : 0 ≤ x := by
   rw_obj =>
+    -- Check goal here.
     rw [rpow_two, sqrt_sq c₁]
+  -- Check goal here.
+  rw_constr c₁ =>
+    -- Check goal right before `rfl`, which does not change anything.
+    rfl
+  rw_constr c₁ into (0 ≤ x) =>
+    -- This illustrates the usage of `into`.
+    -- Check goal right before `rfl`, which does not change anything.
+    rfl
+
+#print p₄
+#check eqv₃
+
+variable {f : ℝ → ℝ} {cs : ℝ → Prop}
+
+#check map_objFun_log (D := {** ℝ ** x **}) (f := fun x => f x) (cs := fun x => cs x)
+
+#check map_le_constraint_standard_form
+
+#check map_eq_constraint_standard_form
+
+equivalence eqv₄/p₅ :
+  optimization (x y z : ℝ)
+    minimize (x + y + z)
+    subject to
+      c₁ : 0 ≤ x
+      c₂ : 0 ≤ y
+      c₃ : 0 ≤ z := by
+  rename_vars [a, b, c]
+
+#print p₅
+#check eqv₄
+
+equivalence eqv₅/p₆ : p₅ := by
+  rename_constrs [c₁', c₂']
+
+#print p₆
+#check eqv₅
+
+equivalence eqv₆/p₇ : p₆ := by
+  reorder_constrs [c₃, c₂', c₁']
+
+#print p₇
+#check eqv₆
+
+equivalence eqv₇/p₈ :
+  optimization (x : ℝ)
+    minimize x
+    subject to
+      c₁ : 1 ≤ x
+      c₂ : 0 < exp x := by
+  remove_constr c₂ =>
+    positivity
+
+#print p₈
+#check eqv₇
+
+#check eliminate_eq_constraint_standard_form
+
+#check decompose_constraint
+
+#check add_slack_variable_standard_form
+
+#check epigraph_form
 
 end Equivalences
 
-namespace Relaxations
+namespace Reductions
 
 /-! Section 3.4 -/
+
+def p :=
+  optimization (x y : ℝ)
+    minimize (x + y)
+    subject to
+      c₁ : 1 ≤ x
+      c₂ : 1 ≤ y
+
+reduction red/q : p := by
+  change_of_variables (u) (x ↦ exp u)
+  change_of_variables (v) (y ↦ exp v)
+
+#print q
+#check red
+
+reduction* redComp/q' : p := by
+  change_of_variables (u) (x ↦ exp u)
+  change_of_variables (v) (y ↦ exp v)
+
+#eval redComp.backward_map ⟨1, 1⟩
+
+end Reductions
+
+namespace Relaxations
+
+/-! Section 3.5 -/
+
+open Relaxation
+
+def p :=
+  optimization (x : ℝ)
+    minimize x
+    subject to
+      c₁ : log x + exp x + sqrt x + x ^ x ≤ 7
+      c₂ : 0 ≤ x
+
+relaxation rel/q : p := by
+  relaxation_step =>
+    exact remove_constraint (cs' := fun x => 0 ≤ x) (hcs := fun x => by rfl)
+
+#print q
+#check rel
 
 def p₁ :=
   optimization (x y : ℝ)
