@@ -219,8 +219,9 @@ equivalence eqv₃/p₄ :
         c₁ : 0 ≤ x := by
   rw_obj =>
     -- Check goal here.
-    rw [rpow_two, sqrt_sq c₁]
-  -- Check goal here.
+    rewrite [rpow_two, sqrt_sq c₁]
+    -- Check goal here.
+    rfl
   rw_constr c₁ =>
     -- Check goal right before `rfl`, which does not change anything.
     rfl
