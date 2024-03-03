@@ -233,6 +233,25 @@ equivalence eqv₃/p₄ :
 #print p₄
 #check eqv₃
 
+equivalence eqv₃'/p₄' :
+    optimization (x y : ℝ)
+      minimize -log (x + y)
+      subject to
+        c₁ : 2 ≤ x
+        c₂ : 3 ≤ y
+        c₃ : log (y / x) ≤ 0 := by
+  rw_constr c₃ into (log (y / x) ≤ log 1) =>
+    simp
+  rw_constr c₃ into (y / x ≤ 1) =>
+    rw [log_le_log_iff] <;> positivity
+  rw_constr c₃ into (y ≤ 1 * x) =>
+    rw [div_le_iff] <;> positivity
+  rw_constr c₃ into (y ≤ x) =>
+    simp
+
+#print p₄'
+#check eqv₃'
+
 variable {f : ℝ → ℝ} {cs : ℝ → Prop}
 
 #check map_objFun_log (D := {** ℝ ** x **}) (f := fun x => f x) (cs := fun x => cs x)
