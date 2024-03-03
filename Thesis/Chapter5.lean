@@ -36,6 +36,33 @@ equivalence eqv₂/q₁ : qByHand := by
 
 end MotivatingExample
 
+namespace ProofReconstruction
+
+/-! Section 5.5 -/
+
+open MotivatingExample
+
+-- Here, we see the step-by-step construction by hand.
+
+equivalence* eqv/q : p := by
+  rw_constr c₂ =>
+    rw [div_le_iff (by arith)]
+  rw_constr c₂ =>
+    rw [mul_comm]
+  rw_constr c₂ =>
+    rw [← div_le_iff (by arith)]
+  rw_constr c₂ =>
+    rw [← exp_neg_eq_one_div]
+
+#print q
+#check eqv
+
+solve q
+
+#eval eqv.backward_map q.solution -- 0.426303
+
+end ProofReconstruction
+
 namespace PreDCPProcedure
 
 /-! Section 5.6 -/
