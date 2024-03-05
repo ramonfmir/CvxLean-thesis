@@ -138,7 +138,8 @@ def gp :=
       h₆ : x ^ 2 + 3 * y / z ≤ 5 * sqrt y
       h₇ : x * y = z ^ 2
 
--- Note that we need to help the arithmetic tactics a bit to prove results about feasibility.
+-- We need to help the arithmetic tactics a bit to prove results about feasibility. Also, these
+-- feasibility checks are an excellent benchmark for future non-linear arithmetic tactics!
 
 lemma sqrt_4_eq : sqrt (4 : ℝ) = 2 := by
   have h : (4 : ℝ) = 2 ^ 2 := by norm_num
