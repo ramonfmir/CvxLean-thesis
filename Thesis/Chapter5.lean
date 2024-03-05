@@ -86,6 +86,56 @@ solve q
 
 end PreDCPProcedure
 
+namespace EvaluationExamples
+
+/-! Section 5.7.1 -/
+
+def gp :=
+  optimization (x y z : ℝ)
+    minimize 1 / (x / y)
+    subject to
+      h1 : 0 < x
+      h2 : 0 < y
+      h3 : 0 < z
+      h4 : 2 ≤ x
+      h5 : x ≤ 3
+      h6 : x ^ 2 + 3 * y / z ≤ 5 * sqrt y
+      h7 : x * y = z ^ 2
+
+equivalence* eqv₁/q₁ : gp := by
+  change_of_variables! (u) (x ↦ exp u)
+  change_of_variables! (v) (y ↦ exp v)
+  change_of_variables! (w) (z ↦ exp w)
+  pre_dcp
+
+#print q₁
+#check eqv₁
+
+solve q₁
+
+#eval eqv₁.backward_map q₁.solution -- (2.000000, 1.930782, 1.965086)
+
+def qcp :=
+  optimization (x y : ℝ)
+    minimize -y
+    subject to
+      h1 : 1 ≤ x
+      h2 : x ≤ 2
+      h3 : 0 ≤ y
+      h4 : sqrt ((2 * y) / (x + y)) ≤ 1
+
+equivalence* eqv₂/q₂ : qcp := by
+  pre_dcp
+
+#print q₂
+#check eqv₂
+
+solve q₂
+
+#eval eqv₂.backward_map q₂.solution -- (2.000000, 2.000000)
+
+end EvaluationExamples
+
 end Chapter5
 
 end
