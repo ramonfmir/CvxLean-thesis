@@ -118,4 +118,96 @@ namespace FormalizedMathematics
 
 end FormalizedMathematics
 
+noncomputable section
+
+namespace DGP
+
+/-! Section 2.2.3 -/
+
+open CvxLean Minimization Real
+
+def gp :=
+  optimization (x y z : ℝ)
+    minimize 1 / (x / y)
+    subject to
+      h₁ : 0 < x
+      h₂ : 0 < y
+      h₃ : 0 < z
+      h₄ : 2 ≤ x
+      h₅ : x ≤ 3
+      h₆ : x ^ 2 + 3 * y / z ≤ 5 * sqrt y
+      h₇ : x * y = z ^ 2
+
+-- Note that we need to help the arithmetic tactics a bit to prove results about feasibility.
+
+lemma sqrt_4_eq : sqrt (4 : ℝ) = 2 := by
+  have h : (4 : ℝ) = 2 ^ 2 := by norm_num
+  rw [h, rpow_two, sqrt_sq]; norm_num
+
+lemma le_sqrt_8 : 2 ≤ sqrt (8 : ℝ) := by
+  rw [le_sqrt] <;> norm_num
+
+lemma le_sqrt_10 : 3 ≤ sqrt (10 : ℝ) := by
+  rw [le_sqrt] <;> norm_num
+
+lemma sqrt_30_eq_mul : sqrt (30 : ℝ) = sqrt 3 * sqrt 10 := by
+  rw [← sqrt_mul] <;> norm_num
+
+-- Now, we show that points `a` and `b` are feasible.
+
+def a : ℝ × ℝ × ℝ := ⟨2, 4, sqrt 8⟩
+
+lemma feasible_a : gp.feasible a := by
+  simp [a, gp, feasible, sqrt_4_eq]; norm_num
+  rw [add_comm, ← le_sub_iff_add_le, div_le_iff] <;> norm_num
+  let x := sqrt (8 : ℝ)
+  show 12 ≤ 6 * x
+  have h : 2 ≤ x := le_sqrt_8
+  linarith
+
+def b : ℝ × ℝ × ℝ := ⟨3, 10, sqrt 30⟩
+
+lemma feasible_b : gp.feasible b := by
+  simp [b, gp, feasible]; norm_num
+  rw [sqrt_30_eq_mul, ← le_sub_iff_add_le, ← sub_mul]
+  have h₁ : 3 ≤ 5 - sqrt (3 : ℝ) := by
+    rw [le_sub_iff_add_le, add_comm, ← le_sub_iff_add_le]
+    rw [sqrt_le_iff]; norm_num
+  have h₂ : 3 * 3 ≤ (5 - sqrt 3) * sqrt 10 := by
+    apply mul_le_mul h₁ (le_sqrt_10) <;> norm_num
+    rw [sqrt_le_iff]; norm_num
+  refine le_trans ?_ h₂
+  norm_num
+
+-- We show that the point in the middle, `c`, does not satisfy `x * y = z ^ 2`. This means that the
+-- constraint does not represent a convex set. Also, it implies that the feasible set is not convex.
+
+def c : ℝ × ℝ × ℝ := (a + b) / 2
+
+lemma c_def : c = ⟨2.5, 7, (sqrt 8 + sqrt 30) / 2⟩ := by
+  show (a + b) / ⟨(2 : ℝ), (2 : ℝ), (2 : ℝ)⟩ = _
+  simp [a, b]; norm_num
+
+lemma not_h₇_c : ¬ (c.1 * c.2.1 = c.2.2 ^ 2) := by
+  rw [c_def]; dsimp; norm_num
+  rw [eq_div_iff (by norm_num)]; norm_num
+  apply ne_of_gt; rw [sq_lt]; split_ands
+  . have h₁ : 0 < sqrt 70 := by norm_num
+    have h₂ : 0 < sqrt 8 := by norm_num
+    have h₃ : 0 < sqrt 30 := by norm_num
+    linarith
+  . have h₁ : 8.35 < sqrt 70 := by rw [lt_sqrt] <;> norm_num
+    have h₂ : sqrt 8 < 2.83 := by rw [sqrt_lt] <;> norm_num
+    have h₃ : sqrt 30 < 5.48 := by rw [sqrt_lt] <;> norm_num
+    have h₅ : (2.83 : ℝ) + 5.48 < 8.35 := by norm_num
+    linarith
+
+lemma not_feasible_c : ¬ gp.feasible c := by
+  simp [gp, feasible, -rpow_two]
+  intros; exact not_h₇_c
+
+end DGP
+
+end
+
 end Chapter2
