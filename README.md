@@ -10,7 +10,7 @@ One can navigate to them using the following shortcut: (`Cmd` / `Ctrl`) + click.
 ### Installation 
 
 Install CvxLean's requirements (Lean, Rust, and MOSEK).
-Then run the following command.
+Then run the following script, replacing the MOSEK path as indicated.
 ```
 ./build.sh
 ```

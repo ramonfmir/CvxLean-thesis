@@ -11,6 +11,11 @@ lake build
 
 cd .lake/packages/CvxLean
 
+# ! REPLACE PATH HERE !
+mosek_path="/Users/ramonfernandezmir/Documents/PhD-code/optimization/mosek/10.0/tools/platform/osxaarch64/bin"
+code="def mosekBinPath := \"$mosek_path\""
+echo $code > Command/Solve/Mosek/Path.lean
+
 lake exe cache get
 lake run EggClean
 lake build EggPreDCP
